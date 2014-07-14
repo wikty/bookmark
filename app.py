@@ -23,7 +23,7 @@ DATABASE = {
     'engine': 'peewee.SqliteDatabase'
 }
 PASSWORD = 'wiktymouse'
-PHANTOM = '/home/wikty/bin/phantomjs'
+PHANTOM = './vendor/phantomjs/bin/phantomjs'
 SCRIPT = os.path.join(APP_ROOT, 'screenshot.js')
 PERPAGE = 20
 

@@ -1,3 +1,5 @@
 example
 venv
+vendor
 *.pyc
+*.*~
