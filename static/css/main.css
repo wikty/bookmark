@@ -1,0 +1,87 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+
+html,
+body {
+  height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by it's height */
+  margin: 0 auto -60px;
+  width: auto;
+  max-width: 767px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+#footer {
+  height: 60px;
+}
+#footer {
+  background-color: #f5f5f5;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+  #footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+.container .credit {
+  margin: 20px 0;
+}
+
+#zoomcontrol {
+  position: fixed;
+  top: 30px;
+  right: 20px;
+}
+
+#removeSignBtn {
+  position: absolute;
+  right: -12px;
+  bottom: -12px; 
+  width: 28px; 
+  height: 28px; 
+  -webkit-border-radius: 14px 14px 14px 14px; 
+  -moz-border-radius: 14px 14px 14px 14px; 
+  border-radius: 14px 14px 14px 14px;
+}
+
+.double-bigger-icon {
+   transform:scale(2.0,2.0);
+   -ms-transform:scale(2.0,2.0); /* IE 9 */
+   -moz-transform:scale(2.0,2.0); /* Firefox */
+   -webkit-transform:scale(2.0,2.0); /* Safari and Chrome */
+   -o-transform:scale(2.0,2.0); /* Opera */
+}
+
+div.thumbnail p {
+  word-wrap: break-word;
+}
+
+.page-header {
+  position: relative;
+}
+
+#addBookmarkBtn {
+  position: absolute;
+  right: 20px;
+  bottom: 9px;
+}
+
+.page-header a {
+    text-decoration: none;
+}
+
+
