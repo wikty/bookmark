@@ -15,6 +15,8 @@ from flask_peewee.db import Database
 #from flask_peewee.utils import object_list, PaginatedQuery
 from peewee import *
 
+from middleman import upload_file, remove_file
+
 APP_ROOT = os.path.dirname(os.path.realpath(__file__))
 MEDIA_ROOT = os.path.join(APP_ROOT, 'static/screenshots')
 MEDIA_URL = '/static/screenshots/'
@@ -48,7 +50,9 @@ class Bookmark(db.Model):
 
         exitcode = subprocess.call(params)
         if exitcode == 0:
-            self.image = os.path.join(MEDIA_URL, filename)
+            remote_url = upload_file(outfile)
+            if remote_url is not None:
+                self.image = remote_url
 
 @app.route('/')
 def index():
