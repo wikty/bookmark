@@ -1,6 +1,8 @@
 import os
 
-import qiniu
+import qiniu.conf
+import qiniu.rs
+import qiniu.io
 
 qiniu.conf.ACCESS_KEY = 'eQ0y6hajOhZRJpc5PdpkTPgq-6X7_lVHbnB98yz6'
 qiniu.conf.SECRET_KEY = 'wVGUkLl_GETJb59t5jT--FTsx0r9-q7Yd2rqU0gn'
@@ -22,7 +24,7 @@ def upload_file(localfile):
         return QINIU_BUCKET_URL + remote_key
 
 
-def remove_file(localfile, remote_key)
+def remove_file(localfile, remote_key):
     ret, err = qiniu.rs.Client().delete(bucket_name, key)
     if err is not None:
         return 'failure'
