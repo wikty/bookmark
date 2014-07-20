@@ -36,6 +36,7 @@ if 'PRODUCTION' in os.environ:
     DATABASE = {
         'engine': 'peewee.PostgresqlDatabase',
         'name': url.path[1:],
+        'user': url.username,
         'password': url.password,
         'host': url.hostname,
         'port': url.port,
