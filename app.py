@@ -3,10 +3,10 @@ import hashlib
 import datetime
 import subprocess
 #import itertools
-#import logging
-#logging.basicConfig(level=logging.DEBUG,
-#                    format='%s'
-#)
+import logging
+logging.basicConfig(level=logging.DEBUG,
+                    format='%s'
+)
 
 # flask is a python microframework
 # peewee is a python ORM
@@ -43,9 +43,9 @@ if 'PRODUCTION' in os.environ:
 else:
     DATABASE = {
         'engine': 'peewee.PostgresqlDatabase',
-        'name': 'wikty',
-        'user': 'wikty',
-        'password': '',
+        'name': 'dog',
+        'user': 'dog',
+        'password': 'wiktymouse',
         'host': 'localhost',
         'port': 5432,
         'threadlocals': True
@@ -53,7 +53,7 @@ else:
 
 
 PASSWORD = 'wiktymouse'
-PHANTOM = './vendor/phantomjs/bin/phantomjs'
+PHANTOM = os.path.join(APP_ROOT, 'vendor/phantomjs/bin/phantomjs')
 SCRIPT = os.path.join(APP_ROOT, 'screenshot.js')
 PERPAGE = 20
 
@@ -75,12 +75,17 @@ class Bookmark(db.Model):
 
         outfile = os.path.join(MEDIA_ROOT, filename)
         params = [PHANTOM, SCRIPT, self.url, outfile]
-
+        
         exitcode = subprocess.call(params)
         if exitcode == 0:
             remote_url = upload_file(outfile)
             if remote_url is not None:
                 self.image = remote_url
+                return
+
+        # if fetch or upload failure, using a placeholder image
+        self.image = os.path.join(MEDIA_ROOT, 'placeholder.png')
+        
 
 @app.route('/')
 def index():
@@ -116,6 +121,7 @@ def add():
     if url:
         bookmark = Bookmark(url=url)
         bookmark.fetch_image()
+        # logging.debug(bookmark.image)
         bookmark.save()
         return redirect(url)
     abort(404)
