@@ -20,10 +20,38 @@ from middleman import upload_file, remove_file
 APP_ROOT = os.path.dirname(os.path.realpath(__file__))
 MEDIA_ROOT = os.path.join(APP_ROOT, 'static/screenshots')
 MEDIA_URL = '/static/screenshots/'
-DATABASE = {
-    'name': os.path.join(APP_ROOT, 'bookmarks.db'),
-    'engine': 'peewee.SqliteDatabase'
-}
+
+# DATABASE = {
+#     'name': os.path.join(APP_ROOT, 'bookmarks.db'),
+#     'engine': 'peewee.SqliteDatabase'
+# }
+
+import urlparse
+import psycopg2
+
+if 'PRODUCTION' in os.environ:
+    urlparse.uses_netloc.append('postgres') 
+    url = urlparse.urlparse(os.environ['DATABASE_URL'])
+
+    DATABASE = {
+        'engine': 'peewee.PostgresqlDatabase',
+        'name': url.path[1:],
+        'password': url.password,
+        'host': url.hostname,
+        'port': url.port,
+    }
+else:
+    DATABASE = {
+        'engine': 'peewee.PostgresqlDatabase',
+        'name': 'wikty',
+        'user': 'wikty',
+        'password': '',
+        'host': 'localhost',
+        'port': 5432,
+        'threadlocals': True
+    }
+
+
 PASSWORD = 'wiktymouse'
 PHANTOM = './vendor/phantomjs/bin/phantomjs'
 SCRIPT = os.path.join(APP_ROOT, 'screenshot.js')
