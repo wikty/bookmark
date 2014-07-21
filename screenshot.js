@@ -19,13 +19,18 @@ page.onError = function(msg, trace){
 
 page.settings.resourceTimeout = 5000; // 5 seconds
 page.onResourceTimeout = function(e){
-    console.log("Resource: " + e.url);
-    console.log("Method: " + e.method);
-    console.log("HTTP Headers: " + JSON.stringify(e.headers));
-    console.log("Reason: " + e.errorString);
+    console.log("");
+    console.log("");
+    console.log("------> PhantomJS Logging");
+    console.log("   Resource: " + e.url);
+    console.log("   Method: " + e.method);
+    console.log("   HTTP Headers: " + JSON.stringify(e.headers));
+    console.log("   Reason: " + e.errorString);
     // phantom.exit(1);
     // do not exit phantomjs, just skip the timeout resouce(do nothing in this function)
-    console.log("Processing: Just skip the timeout resource");
+    console.log("   Processing: Just skip the timeout resource");
+    console.log("");
+    console.log("");
 };
 
 try{

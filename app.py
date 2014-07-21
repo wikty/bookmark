@@ -68,7 +68,7 @@ class Bookmark(db.Model):
     image = CharField(default='')
 
     class Meta:
-        ordering = (('created_date', 'desc'), )
+        order_by = ('-created_date', )
 
     def fetch_image(self):
         url_hash = hashlib.md5(self.url).hexdigest()
@@ -85,7 +85,7 @@ class Bookmark(db.Model):
                 return
 
         # if fetch or upload failure, using a placeholder image
-        self.image = os.path.join(MEDIA_ROOT, 'placeholder.png')
+        self.image = os.path.join('/static/img', 'placeholder.png')
         
 
 @app.route('/')
