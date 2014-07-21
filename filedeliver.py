@@ -25,6 +25,6 @@ def upload_file(localfile):
 
 
 def remove_file(localfile, remote_key):
-    ret, err = qiniu.rs.Client().delete(bucket_name, key)
+    ret, err = qiniu.rs.Client().delete(QINIU_BUCKET_NAME, remote_key)
     if err is not None:
         return 'failure'

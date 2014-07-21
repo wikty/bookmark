@@ -14,6 +14,10 @@ from flask import Flask, abort, redirect, render_template, request
 from flask_peewee.db import Database
 #from flask_peewee.utils import object_list, PaginatedQuery
 from peewee import *
+from flask_peewee.auth import Auth
+from flask_peewee.auth import BaseUser
+from flask_peewee.admin import Admin, ModelAdmin
+from flask_peewee.rest import RestAPI
 
 from middleman import upload_file, remove_file
 
@@ -57,10 +61,26 @@ PASSWORD = 'wiktymouse'
 PHANTOM = os.path.join(APP_ROOT, 'vendor/phantomjs/bin/phantomjs')
 SCRIPT = os.path.join(APP_ROOT, 'screenshot.js')
 PERPAGE = 20
+SECRET_KEY ='asdfghjkl999'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 db = Database(app)
+
+class User(db.Model, BaseUser):
+    username = CharField()
+    password = CharField()
+    email = CharField()
+    join_date = DateTimeField(default=datetime.datetime.now)
+    active = BooleanField(default=True)
+    admin = BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.username
+
+    def gravatar_url(self, size=80):
+        return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
+            (md5(self.email.strip().lower().encode('utf-8')).hexdigest(), size)
 
 class Bookmark(db.Model):
     url = CharField()
@@ -87,6 +107,8 @@ class Bookmark(db.Model):
         # if fetch or upload failure, using a placeholder image
         self.image = os.path.join('/static/img', 'placeholder.png')
         
+class BookmarkAdmin(ModelAdmin):
+    columns = ('url', 'created_date', 'image', )
 
 @app.route('/')
 def index():
@@ -127,9 +149,39 @@ def add():
         return redirect(url)
     abort(404)
 
+auth = Auth(app, db, user_model=User)
+
+# Add a admin by python shell
+#from app import auth
+#auth.User.create_table(fail_silently=True)  # make sure table created.
+#admin = auth.User(username='admin', email='', admin=True, active=True)
+#admin.set_password('admin')
+#admin.save()
+admin = Admin(app, auth)
+admin.register(Bookmark, BookmarkAdmin)
+auth.register_admin(admin)  # must register before admin setup
+admin.setup()
+
+
+# The default authentication mechanism for the API only accepts GET requests. 
+# In order to handle POST/PUT/DELETE you will need to use a subclass of the Authentication class.
+api = RestAPI(app)
+api.register(Bookmark)
+api.setup()
+
+
 if __name__ == '__main__':
     # Create Bookmark database table if does not exist
     Bookmark.create_table(True)
+    auth.User.create_table(True)
+
+    # add admin user
+    if(not auth.User.select().where(username=='asdfghjkl999',
+                                 admin=True,
+                                 ).exists()):
+        admin = auth.User(username='asdfghjkl999', email='xiaowenbin_999@163.com', admin=True, active=True)
+        admin.set_password('asdfghjkl999')
+        admin.save()
     
     # Run application
     app.run()
