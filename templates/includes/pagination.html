@@ -1,5 +1,6 @@
 <div class="pagination pagination-centered">
     <ul>
+    {% with total_pages=pagination.get_pages() %}
     {% if page > 1 %}
         <li><a href="./?page{{ page - 1}}">&laquo;</a></li>
     {% elif page != 1 %}
@@ -19,6 +20,6 @@
     {% elif page != 1 %}
         <li class="disabled"><span>&raquo;</span></li>
     {% endif %}  
-
+    {% endwith %}
     </ul>
 </div>

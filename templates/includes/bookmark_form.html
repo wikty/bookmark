@@ -1,43 +1,35 @@
-
-    <input type="text" name="url" />
-    <input type="text" name="tags" />
-    {% if bookmark %}
-    <input type="hidden" name="id" value="{{ bookmark.id }}" />
-    {% endif %}
-    <textarea name="title"></textarea>
-    <button class="btn btn-primary" type="submit"></button>
-
-
-
-
-
-
-
-
-
-{% if user and message.user == user %}<a class="message-edit" href="{{ url_for('edit', message_id=message.id) }}">edit</a>{% endif %}
-<a class="avatar" href="{{ url_for('user_detail', username=message.user.username) }}"><img src="{{ message.user.gravatar_url() }}" /></a>
-<p class="message-content">{{ message.content|urlize }}</p>
-
-<ul class="thumbnails">
-    {% for bookmark in bookmarks %}
-    <li class="span4">
-        <div class="thumbnail">
-            <a href="{{ bookmark.url }}" title="{{ bookmark.url }}">
-                <img src="{{ bookmark.image }}" />
-            </a>
-            <div class="caption">
-                <p>
-                {% if bookmark.title %}
-                {{ bookmark.title |urlize }}
-                {% else %}
-                <a href="{{ bookmark.url }}">{{ bookmark.url }}</a>
-                {% endif %}
-                </p>
-                <p class="muted">{{ bookmark.created_date.strftime("%Y-%m-%d %H:%M") }}</p>
-                <p><a href="{{ bookmark.url }}" class="btn btn-primary">Go</a></p>
+    <div class="control-group">
+        <label class="control-label" for="bookmarkURLInput">书签网址</label>
+        <div class="controls">
+            <div class="input-prepend">
+                <span class="add-on">http://</span>
+                <input type="text" id="bookmarkURLInput" name="url" placeholder="书签网址，例如：www.example.com" />
             </div>
+            {% if bookmark %}
+            <input type="hidden" name="id" value="{{ bookmark.id }}" />
+            {% endif %}
+            {% if error['url'] %}
+            <span class="help-inline text-error">{{ error['url'] }}</span>
+            {% endif %}
         </div>
-    </li>
-    {% endfor %}
-</ul>
+    </div>
+
+    <div class="control-group">
+        <label class="control-label" for="bookmarktags"></label>
+        <div class="controls">
+            <input type="text" id="bookmarktags" name="tags" placeholder="标签间用空格分隔">
+            {% if error['tags'] %}
+            <span class="help-inline text-error">{{ error['tags'] }}</span>
+            {% endif %}
+        </div>
+    </div>
+     
+    <div class="control-group">
+        <label class="control-label" for="bookmarktitle"></label>
+        <div class="controls">
+            <textarea type="text" id="bookmarktitle" name="title"></textarea>
+            {% if error['title'] %}
+            <span class="help-inline text-error">{{ error['title'] }}</span>
+            {% endif %}
+        </div>
+    </div>
