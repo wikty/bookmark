@@ -41,24 +41,6 @@ $(document).ready(function(){
         }
     };
     
-    var onEnterThumbnail = function(event) {
-        $(this).children("div.thumbnail").css({"border-color": "rgb(100, 100, 100)", "position": "relative"}).append($removeSignBtn);
-    
-    };
-    
-    var onLeaveThumbnail = function(event) {
-        $(this).children("div.thumbnail").css({"border-color": "rgb(221, 221, 221)", "position": "static"}).children('button').remove();
-    };
-    
-    var $removeSignBtn = $('<button id="removeSignBtn" class="btn btn-inverse"><icon class="icon-remove-sign icon-white double-bigger-icon"></icon></button>');
-    var onRemoveSignBtn = function(even) {
-        console.log('onRemoveSignBtn');
-    };
-    
-    var onAddBookmarkBtn = function(event) {
-        console.log("onAddBookmarkBtn");
-    };
-    
     
     function wrapOnGroup($s, step, wrapper){
         for(var i=0; i<$s.length; i+=step){ // must use $s.length, because length is changing
@@ -70,9 +52,7 @@ $(document).ready(function(){
     $("ul.thumbnails>li").css({"margin-left": "2.127659574468085%", "clear": "none"}).filter(":nth-child("+(maxZoom/$("ul.thumbnails>li").attr("class").match(/\d+$/)[0])+"n+1)").css({"margin-left": "0%", "clear": "both"});
     $("#zoomin").on("click", onZoomIn);
     $("#zoomout").on("click", onZoomOut);
-    $("ul.thumbnails>li").on("mouseenter", onEnterThumbnail);
-    $("ul.thumbnails>li").on("mouseleave", onLeaveThumbnail);
-    $(document).on("click", '#removeSignBtn', onRemoveSignBtn);
-    $("#addBookmarkBtn").on("click", onAddBookmarkBtn);
     
+    //$(document).on("click", '#removeSignBtn', onRemoveSignBtn);
+    $("#addBookmarkBtn").on("click", onAddBookmarkBtn);
 });
