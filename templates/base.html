@@ -1,0 +1,59 @@
+<!doctype>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Bookmarks</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="This is my bookmark site" />
+        <meta name="author" content="XiaoWenBin" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-responsive.min.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}" />
+        
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/form.js') }}"></script>
+        {% if session.logged_in %}
+        <script type="text/javascript" src="{{ url_for('static', filename='js/auth.js') }}"></script>
+        {% endif %}
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+          <script src="{{ url_for('static', filename='js/html5shiv.js') }}"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div id="sidebar-left">{% block sidebar_left %}{% endblock %}</div>
+        <div id="sidebar-right">{% block sidebar_right %}{% endblock %}</div>
+        <div id="wrap"><!-- wrap all page content except for footer -->
+            
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="page-header">
+                        <h1 class="muted"><a href="/">Bookmarks</a></h1>
+                        {% if not session.logged_in %}
+                          <a class="btn btn-large btn-primary" id="signinBtn" href="{{ url_for('auth.login') }}">登录</a>
+                          <a class="btn btn-large btn-success" id="signupBtn" href="{{ url_for('signup') }}">注册</a>
+                        {% else %}
+                          <a class="btn btn-large btn-success" id="addBookmarkBtn" href="{{ url_for('bookmark_add') }}">添加书签</a>
+                          <a class="btn btn-large btn-link" id="signoutBtn" href="{{ url_for('auth.logout') }}">退出</a>
+                        {% endif %}
+                    </div>
+
+                    {% block content %}{% endblock %}
+
+                    </div><!-- close div.row -->
+                <div id="push"></div><!-- placeholder for footer-->
+            </div><!-- close div.container -->
+        </div>
+
+        <div id="footer">
+            <div class="container">
+                <p class="muted credit">Created By <a href="http://profile.wikty.com">XiaoWenBin</a>
+                <span class="pull-right">Hosted By <a href="https://www.heroku.com/">Heroku</a></span>
+                </p>
+            </div>
+        </div>
+       
+    </body>
+</html>
