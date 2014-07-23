@@ -111,8 +111,8 @@ class Tag(db.Model):
 
 class Relationship(db.Model):
     user = ForeignKeyField(User)
-    tag = ForeignKeyField(Tag)
-    bookmark = ForeignKeyField(Bookmark)
+    tag = ForeignKeyField(Tag, related_name='Bookmarks')
+    bookmark = ForeignKeyField(Bookmark, related_name='Tags')
 
     def __unicode__(self):
         return 'Bookmark %s has Tag[%s]' % (self.bookmark, self.tag)
