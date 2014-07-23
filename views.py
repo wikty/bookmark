@@ -3,11 +3,12 @@ import datetime
 
 from validate_email import validate_email
 
-from flask import request, redirect, url_for, render_template, flash, abort
+from flask import request, redirect, url_for, render_template, flash, abort, get_flashed_messages
 
 from flask_peewee.utils import get_object_or_404, object_list
+from peewee import *
 
-from app import app
+from app import app, db
 from auth import auth
 from models import User, Bookmark, Tag, Relationship
 
@@ -33,38 +34,8 @@ def public_timeline():
     messages = Message.select().order_by(Message.pub_date.desc())
     return object_list('public_messages.html', messages, 'message_list')
 
-@app.route('/')
-def index():
-    if auth.get_logged_in_user():
-        return bookmark()
-    else:
-        bookmarks = Bookmark.select().order_by(('created_date', 'desc')).limit(20)
 
-@app.route('/bookmark/')
-def bookmark():
-    page = request.args.get('page', 1)
-    try:
-        page = int(page)
-    except Exception:
-        page = 1
 
-    query = Bookmark.select()
-    bookmarks = []
-    for bookmark in query:
-        bookmarks.append(bookmark)
-    
-    total_pages = (len(bookmarks)+1) / PERPAGE
-    start = PERPAGE * (page-1)
-    end = max(page*PERPAGE, len(bookmarks))
-    bookmarks = bookmarks[start:end]
-    
-    return render_template('index.html', **{'page': page,
-                                            'total_pages': total_pages,
-                                            'per_page': PERPAGE,
-                                            'bookmarks': bookmarks
-    })
-
-    return object_list('bookmark_list.html', bookmarks, 'bookmarks', per_page=PERPAGE, total_pages=total_pages)
 
 @app.route('/add/')
 def add():
@@ -118,22 +89,7 @@ def signup():
 
     return render_template('signup.html', error=error, form=request.form)
 
-@app.route('/following/')
-@auth.login_required
-def following():
-    user = auth.get_logged_in_user()
-    return object_list('user_following.html', user.following(), 'user_list')
 
-@app.route('/followers/')
-@auth.login_required
-def followers():
-    user = auth.get_logged_in_user()
-    return object_list('user_followers.html', user.followers(), 'user_list')
-
-@app.route('/users/')
-def user_list():
-    users = User.select().order_by(User.username)
-    return object_list('user_list.html', users, 'user_list')
 
 @app.route('/users/<username>/')
 def user_detail(username):
@@ -162,88 +118,29 @@ def user_unfollow(username):
     ).execute()
     flash('You are no longer following %s' % user.username)
     return redirect(url_for('user_detail', username=user.username))
-# CREATE
-# user = User.create(username='wikty', active=True)
-# user.save()
-# user.id
-#
-# q = User.insert(**{'username': 'admin'})  # insert one row
-# usernames = ['wikty','mouse', 'moss']
-# usernames = [{'username': user} for user in usernames]
-# q = User.insert_many(usernames)  # insert multiple rows
-# q.execute()
-#
-# UPDATE
-# user = User.get(User.id==2)
-# user.username = 'xiao'  # the user had a primary key
-# user.save()  # update the instance
-# 
-# q = Food.update(price=Food.price + 12).where(Food.created_date < this_week)
-# q.execute()  # update multiple records
-#
-# DELETE
-# user = User.get(User.id==2)
-# user.delete_instance()  # delete the instance
-#
-# q = User.delete().where(User.active=False)
-# q.execute()
-#
-# RETIRVE
-# user = User.get(username='wikty')  # just return one result, if no match, raise User.DoesNotExist
-# 
-# q = User.select()  # when you iterate the query, it will automatically execute
-#
-# the ForeignKeyField as a SelectQuery by related_name, e.g.
-# for bookmark in user.Bookmarks  # iterate
-# for bookmark in user.Bookmarks.order_by(Bookmark.created_date)  # iterate and append query
-#
-# specific filter
-# where((User.username == 'wikty') |(User.username == 'mouse'))  # or condition
-# users = User.select()where(fn.Lower(fn.Substr(User.username, 1, 1)) == 'a')  # database function
-# bookmarks = Bookmark.select().where(Bookmark.user << users)  # item in set
-# 
-# sort
-# User.select().order_by(User.username)
-# User.select().order_by(User.username.desc())
-# Bookmark.select().join(User).order_by(User.username, Bookmark.created_date.desc())
-#
-# random results
-# PostgreSQL and SQLite
-# bookmarks = Bookmark.select().order_by(fn.Random()).limit(5)  # pick 5 random bookmarks
-# MySQL
-# bookmarks = Bookmark.select().order_by(fn.Rand()).limit(5)  # pick 5 random bookmarks
-#
-# paginate
-# Bookmark.select().order_by(Bookmark.created_date).paginate(2, 20)  # (pagenum, perpage), pagenum start as 1
-# 
-# count
-# Bookmark.select().count()
-# Bookmark.select(fn.Count(fn.Distinct(Bookmark.url))).scalar()  # return 30
-# Employee.select(fn.Min(Employee.salary), fn.Max(Employee.salary)).scalar(as_tuple=True)  # return (200, 300)
-#
-# iterate large results
-# for b in Bookmark.select().execute().iterator():
-# for b in Bookmark.select().native.execute().iterator():
-#
-# alias 
-# query = User.select(User, fn.Count(Tweet.id).alias('ct')).join(Tweet).group_by(User).order_by(SQL('ct'))
-#
-# group by
-# q = User.select().annotate(Bookmark)  # is equivalent to the following
-# q = User.select(User, fn.Count(Bookmark.id).alias('count')).join(Bookmark).group_by(User)
-# q = User.select().join(Bookmark, JOIN_LEFT_OUTER).annotate(Bookmark)  # contain user even no bookmark
-# q = User.select().annotate(Bookmark, fn.Max(Bookmark.created_date).alias('latest'))
-# q = Tag.select().join(Bookmark2Tag).join(Bookmark).group_by(Tag).having(fn.Count(Bookmark.id) > 5)
-# q = Tag.select(Tag, fn.Count(Bookmark.id).alias('count')).join(Bookmark2Tag).join(Bookmark).group_by(Tag).having(fn.Count(Bookmark.id) > 5)
-# 
-# one -> multiple
-# Message.select().join(User).where(User.username == 'wikty')
-# User.select().join(Message).where(User.username == 'wikty')
-# 
-# multiple -> mutiple
-# Tag.select().join(Bookmark2Tag).join(Bookmark)
 
+@app.route('/')
+def index():
+    if auth.get_logged_in_user():
+        return bookmark()
+    else:
+        bookmarks = Bookmark.select().order_by(fn.Random()).limit(PERPAGE)  # random pick 30 bookmarks
+        return object_list('bookmark_list.html',
+                            bookmarks,
+                            'bookmarks',
+                            paginate_by=PERPAGE)
 
+@app.route('/bookmark/')
+@app.login_required
+def bookmark(username):
+    user = auth.get_logged_in_user()
+    # object_list automatically invoke PaginateQuery
+    # capture request.args.get('page') to calucalte pagination
+    bookmarks = user.Bookmarks
+    return object_list('bookmark_list.html',
+                        bookmarks,
+                        'bookmarks',
+                        paginate_by=PERPAGE)
 
 
 @app.route('/bookmark/add/', methods=['GET', 'POST'])
@@ -254,39 +151,53 @@ def bookmark_add():
     if request.method == 'POST':
         if not request.form['url']:
             error['url'] = '书签的网址不能为空'
-
         if not error:
             try:
-                Bookmark.select().where(Bookmark.user == user,
+                bookmark = Bookmark.select().where(Bookmark.user == user,
                                         Bookmark.url == request.form['url']
                 ).get()
             except Bookmark.DoesNotExist:
-                bookmark = Bookmark.create(
-                    user=user,
-                    url=request.form['url'],
-                    title=request.form['title']
-                )
-                bookmark.fetch_image()
-                bookmark.save()
+                try:
+                    db.set_autocommit(False)
+                    
+                    bookmark = Bookmark.create(
+                        user=user,
+                        url=request.form['url'],
+                        title=request.form['title']
+                    )
+                    bookmark.fetch_image()
+                    bookmark.save()
 
-                tags = re.split('\s+', request.form['tags'].strip())
-                if not Tag.select().where(Tag.user==user,
-                                          )
+                    tagnames = re.split('\s+', request.form['tags'].strip())
+                    for tagname in tagnames:
+                        if not Tag.select().where(Tag.user == user,
+                                                  Tag.name == tagname
+                                                 ).exists():
+                            tag = Tag.create(user=user, name=tagname)
+                            tag.save()
 
+                            relationship = Relationship.create(
+                                user=user,
+                                tag=tag,
+                                bookmark=bookmark)
+                            relationship.save()
+                except Exception as e:
+                    db.rollback()
+                    flash('对不起，服务器太累了，刚罢工了一会儿', 'error')
+                else:
+                    try:
+                        db.commit()
+                    except Exception as e:
+                        db.rollback()
+                        flash('对不起，服务器太累了，刚罢工了一会儿', 'error')
+                finally:
+                    db.set_autocommit(True)
 
-
-
-
-
-
-        message = Message.create(
-            user=user,
-            content=request.form['content'],
-        )
-        flash('Your message has been created')
-        return redirect(url_for('user_detail', username=user.username))
-
-    return render_template('bookmark_add.html')
+                if not get_flashed_messages():
+                    return redirect(url_for('bookmark'))
+            else:
+                flash('书签已经存在，也许你想要<a href="' + url_for('bookmark_edit', id=bookmark.id) + '">编辑</a>此书签', 'info')
+    return render_template('bookmark_add.html', error=error)
 
 @app.route('/bookmark/edit/<int:id>/', methods=['GET', 'POST'])
 @auth.login_required
