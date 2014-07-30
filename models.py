@@ -1,4 +1,5 @@
 import os
+import re
 import datetime
 import subprocess
 
@@ -9,25 +10,6 @@ from peewee import *
 
 from app import db
 from filedeliver import upload_file, remove_file
-
-
-def initdb():
-    # Create tables if does not exist
-    User.create_table(True)
-    Bookmark.create_table(True)
-    Tag.create_table(True)
-    Relationship.create_table(True)
-    
-    # add admin user
-    if(not User.select().where(username=='asdfghjkl999',
-                               email=='xiaowenbin_999',
-                               admin==True,
-                               active==True
-            ).exists()):
-        admin = User.create(username='asdfghjkl999', email='xiaowenbin_999@163.com', admin=True, active=True)
-        admin.set_password('asdfghjkl999')
-        admin.save()
-
 
 class User(db.Model, BaseUser):
     username = CharField()
@@ -71,25 +53,17 @@ class Bookmark(db.Model):
             if remote_url is not None:
                 self.image = remote_url
                 return
+            # remove generated local file
+            os.unlink(outfile)
 
         # if fetch or upload failure, using a placeholder image
         self.image = os.path.join('/static/img', 'placeholder.png')
 
-    def fetch_bookmarks(self, tag=None):
-        # tag is Tag's id
-        if tag is not None:
-            return Bookmark.select().join(
-                Relationship, on=Relationship.bookmark
-            ).where(Relationship.tag==tag).order_by(Bookmark.created_date)
-        else:
-            return Bookmark.select()
-
-    def search_bookmarks(self, kw):
-        if kw:
-            kw = '%'+kw+'%'
-        else:
-            kw = 'aklsfdklsjkdksiwwo'
-        return Bookmark.select().where(Bookmark.title % kw)
+    def fetch_tags(self):
+        return Tag.select().join(Relationship).join(Bookmark).where(Bookmark.url == self.url)
+    
+    def fetch_owner(self):
+        return User.select().where(User.id == self.user).get()
 
 class Tag(db.Model):
     name = CharField()
@@ -98,16 +72,15 @@ class Tag(db.Model):
 
     class Meta:
         order_by = ('name', )
+    
+    def __unicode__(self):
+        return self.name
 
-    def fetch_tags(self, bookmark=None):
-        # bookmark is Bookmark's id
-        if bookmark is not None:
-            return Tag.select().join(
-                Relationship, on=Relationship.tag
-            ).where(Relationship.bookmark==bookmark).order_by(Tag.name)
-        else:
-            return Tag.select()
-
+    def fetch_bookmarks(self):
+        return Bookmark.select().join(Relationship).join(Tag).where(Relationship.user == self.user, Tag.name == self.name)
+    
+    def fetch_owner(self):
+        return User.select().where(User.id == self.user).get()
 
 class Relationship(db.Model):
     user = ForeignKeyField(User)
