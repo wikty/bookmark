@@ -8,6 +8,8 @@ gunicorn==19.0.0
 itsdangerous==0.24
 peewee==2.2.5
 psycopg2==2.5.3
+pydns==2.3.6
 qiniu==6.1.6
+validate-email==1.2
 wsgiref==0.1.2
 wtf-peewee==0.2.3
