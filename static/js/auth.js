@@ -18,7 +18,8 @@ $(document).ready(function(){
     };
 
     var onBookmarkURLInput = function(event) {
-
+        var value = event.target.value;
+        
     };
 
     var onBookmarkTagsInput = function(event) {
