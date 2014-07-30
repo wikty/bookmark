@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+    {# should pass bookmark and user objects into bookmark_meta.html #}
+	{% include "includes/bookmark_meta.html" ignore missing with context %}
+	<form action="{{ url_for('bookmark_edit', id=bookmark.id) }}" method="POST" class="form-horizontal">
+	    <div class="control-group">
+	        <label class="control-label">你确定要删除此标签？</label>
+	        <div class="controls">
+	            <button class="btn btn-large btn-danger">删除</button>
+	        </div>
+	    <div>
+	</form>
+{% endblock %}
