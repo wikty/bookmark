@@ -1,0 +1,25 @@
+<li class="span4">
+    <div class="thumbnail">
+        <a href="{{ bookmark.url }}" title="{{ bookmark.url }}">
+            <img src="{{ bookmark.image }}" />
+        </a>
+        <div class="caption">
+            <p>
+            {% if bookmark.title %}
+            {{ bookmark.title |urlize }}
+            {% else %}
+            <a href="{{ bookmark.url }}">{{ bookmark.url }}</a>
+            {% endif %}
+            </p>
+            <p class="muted">{{ bookmark.created_date.strftime("%Y-%m-%d %H:%M") }}</p>
+            <p><a href="{{ bookmark.url }}" class="btn btn-primary">Go</a>
+            {% if user and bookmark.user == user %}
+            <a id="editBookmarkBtn" class="btn btn-inverse" href="{{ url_for('bookmark_edit', id=bookmark.id) }}"><icon class="icon-edit icon-white double-bigger-icon"></icon></a>
+            {% endif %}
+            </p>
+        </div>
+        {% if user and bookmark.user == user %}
+        	<a id="removeBookmarkBtn" class="btn btn-inverse hide" href="{{ url_for('bookmark_remove', id=bookmark.id) }}"><icon class="icon-remove-sign icon-white double-bigger-icon"></icon></a>
+        {% endif %}
+    </div>
+</li>
