@@ -3,29 +3,29 @@
 {% block content %}
   <form class="form-sign" action="{{ url_for('signup') }}" method="post">
     <h2 class="form-sign-heading">欢迎加入我们</h2>
-    {% with messages = get_flashed_messages(category_filter=["success", ]) %}
+    {% with messages = get_flashed_messages(with_categories=true, category_filter=["success", ]) %}
 	    {% if messages %}
-	    	<div class="alert alert-success">
+	        {% for category, message in messages %}
+	    	<div class="alert alert-{{ category }}">
 	    		<button type="button" class="close" data-dismiss="alert">&times;</button>
-	    	{% for message in messages %}
-	    		{{ message }}
-	    	{% endfor %}
+	    		<p>{{ message }}</p>
 	    	</div>
+	    	{% endfor %}
 	    {% endif %}
-    {% withend %}
-    <input type="text" class="input-block-level" placehodler="用户名" name="username" {% if form['username'] %}value="{{ form['username'] }}" {% endif %}/>
+    {% endwith %}
     {% if error['username'] %}
     <span class="help-block text-error">{{ error['username'] }}</span>
     {% endif %}
-    <input type="text" class="input-block-level" placeholder="邮箱" name="email" {% if form['email'] %}value="{{ form['email'] }}" {% endif %}/>
+    <input type="text" class="input-block-level" placeholder="用户名" name="username" {% if form['username'] %}value="{{ form['username'] }}" {% endif %}/>
     {% if error['email'] %}
     <span class="help-block text-error">{{ error['email'] }}</span>
     {% endif %}
-    <input type="password" class="input-block-level" placeholder="密码" name="password" />
-    <input type="password" class="input-block-level" placeholder="再次输入密码" name="passwordconfirm" />
-    {% if error['password'] %}
+    <input type="text" class="input-block-level" placeholder="邮箱" name="email" {% if form['email'] %}value="{{ form['email'] }}" {% endif %}/>
+   {% if error['password'] %}
     <span class="help-block text-error">{{ error['password'] }}</span>
     {% endif %}
+    <input type="password" class="input-block-level" placeholder="密码" name="password" /> 
+    <input type="password" class="input-block-level" placeholder="再次输入密码" name="passwordconfirm" />
     <button class="btn btn-large btn-primary" type="submit">注册</button>
   </form>
 {% endblock %}
