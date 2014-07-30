@@ -2,8 +2,12 @@
         <label class="control-label" for="bookmarkURLInput">书签网址</label>
         <div class="controls">
             <div class="input-prepend">
-                <span class="add-on">http://</span>
-                <input type="text" id="bookmarkURLInput" name="url" placeholder="书签网址，例如：www.example.com" />
+                <span id="bookmarkURLPrefix">
+                    <button class="btn" type="button">http://</button>
+                    <button class="btn disabled" type="button" disabled="disabled">https://</button>
+                </span>
+                <input type="text" id="bookmarkURLInput" class="input-block-level" name="url" placeholder="书签网址，例如：www.example.com" 
+                {% if form['url'] %}value="{{ form['url'] }}"{% elif bookmark.url %}value="{{ bookmark.url }}"{% endif %}/>
             </div>
             {% if bookmark %}
             <input type="hidden" name="id" value="{{ bookmark.id }}" />
@@ -15,9 +19,10 @@
     </div>
 
     <div class="control-group">
-        <label class="control-label" for="bookmarktags"></label>
+        <label class="control-label" for="bookmarktags">标签</label>
         <div class="controls">
-            <input type="text" id="bookmarktags" name="tags" placeholder="标签间用空格分隔">
+            <input type="text" id="bookmarktags" class="input-block-level" name="tags" placeholder="标签间用空格分隔" 
+            {% if form['tags'] %}value="{{ form['tags'] }}"{% elif bookmark.tags %}value="{{ bookmark.tags }}"{% endif %}/>
             {% if error['tags'] %}
             <span class="help-inline text-error">{{ error['tags'] }}</span>
             {% endif %}
@@ -25,11 +30,18 @@
     </div>
      
     <div class="control-group">
-        <label class="control-label" for="bookmarktitle"></label>
+        <label class="control-label" for="bookmarktitle">描述</label>
         <div class="controls">
-            <textarea type="text" id="bookmarktitle" name="title"></textarea>
+            <textarea type="text" id="bookmarktitle" class="input-block-level" 
+             name="title">{% if form['title'] %}{{ form['title'] }}{% elif bookmark.title %}{{ bookmark.title }}{% endif %}</textarea>
             {% if error['title'] %}
             <span class="help-inline text-error">{{ error['title'] }}</span>
             {% endif %}
+        </div>
+    </div>
+    
+    <div class="control-group">
+        <div class="controls">
+            <button class="btn btn-primary" type="submit">提交</button>
         </div>
     </div>
