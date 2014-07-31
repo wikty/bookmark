@@ -36,9 +36,9 @@ class RelationshipAdmin(ModelAdmin):
 
 
 
-admin = Admin(app, auth, branding='Bookmark后台')
+admin = Admin(app, auth, branding=u'Bookmark后台')
 auth.register_admin(admin)
 admin.register(Relationship, RelationshipAdmin)
 admin.register(Tag, TagAdmin)
 admin.register(Bookmark, BookmarkAdmin)
-admin.register_panel('统计数据', UserStatsPanel)
+admin.register_panel(u'统计数据', UserStatsPanel)
