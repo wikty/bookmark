@@ -4,7 +4,7 @@ import datetime
 
 from validate_email import validate_email
 
-from flask import request, redirect, url_for, render_template, flash, abort, get_flashed_messages, Markup
+from flask import request, redirect, url_for, render_template, flash, abort, get_flashed_messages, Markup, send_file
 
 from flask_peewee.utils import get_object_or_404, object_list
 from peewee import *
@@ -13,6 +13,12 @@ from config import *
 from app import app, db
 from auth import auth
 from models import User, Bookmark, Tag, Relationship
+
+#@app.route('/favicon.ico')
+#def favicon():
+#    favicon_file = os.path.join(APP_ROOT, 'favicon.ico')
+#    if os.path.isfile(favicon_file):
+#        return send_file(favicon_file, mimetype='image/x-icon')
 
 @app.route('/')
 def index():
