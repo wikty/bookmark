@@ -92,6 +92,8 @@ def bookmark_add():
     if request.method == 'POST':
         if not request.form['url']:
             error['url'] = u'书签的网址不能为空'
+        if not request.form['url'].startswith('http://') and not request.form['url'].startswith('https://'):
+            request.form['url'] = ''.join(['http://', request.form['url']])
         if not error:
             try:
                 bookmark = Bookmark.select().where(Bookmark.user == user,
@@ -99,7 +101,7 @@ def bookmark_add():
                 ).get()
             except Bookmark.DoesNotExist:
                 try:
-                    db.set_autocommit(False)
+                    db.database.set_autocommit(False)
                     
                     bookmark = Bookmark.create(
                         user=user,
@@ -125,16 +127,16 @@ def bookmark_add():
                                     bookmark=bookmark)
                                 relationship.save()
                 except Exception as e:
-                    db.rollback()
+                    db.database.rollback()
                     flash(u'对不起，服务器太累了，刚罢工了一会儿', 'error')
                 else:
                     try:
-                        db.commit()
+                        db.database.commit()
                     except Exception as e:
-                        db.rollback()
+                        db.database.rollback()
                         flash(u'对不起，服务器太累了，刚罢工了一会儿', 'error')
                 finally:
-                    db.set_autocommit(True)
+                    db.database.set_autocommit(True)
 
                 if not get_flashed_messages():
                     flash(u'你已经成功添加一个书签', 'success')
@@ -151,7 +153,7 @@ def bookmark_edit(id):
     bookmark = {}
     try:
         bookmark = Bookmark.get(Bookmark.id == id)
-        bookmark.tags = ' '.join([tag.name for tag in bookmark.Tags])
+        bookmark.tags = ' '.join([Tag.get(Tag.id == tagID).name for tagID in [tag.tag for tag in bookmark.Tags]])
     except Bookmark.DoesNotExist:
         flash(u'你要编辑的书签不存在', 'error')
         return redirect(url_for('page_404'))
@@ -167,7 +169,7 @@ def bookmark_edit(id):
             error['url'] = u'书签的网址不能为空'
         if not error:
             try:
-                db.set_autocommit(False)
+                db.database.set_autocommit(False)
                 
                 bookmark.url = request.form['url']
                 bookmark.title = request.form['title']
@@ -190,16 +192,16 @@ def bookmark_edit(id):
                                     bookmark=bookmark)
                                 relationship.save()
             except Exception as e:
-                db.rollback()
+                db.database.rollback()
                 flash(u'对不起，服务器太累了，刚罢工了一会儿', 'error')
             else:
                 try:
-                    db.commit()
+                    db.database.commit()
                 except Exception as e:
-                    db.rollback()
+                    db.database.rollback()
                     flash(u'对不起，服务器太累了，刚罢工了一会儿', 'error')
             finally:
-                db.set_autocommit(True)
+                db.database.set_autocommit(True)
 
             if not get_flashed_messages():
                 flash(u'你刚刚完成一个书签的编辑', 'success')
@@ -219,7 +221,8 @@ def bookmark_remove(id):
         return redirect(url_for('page_404'))
     
     if request.method == 'POST':
-        with db.transaction():
+        with db.database.transaction():
+            bookmark.destory_image()
             bookmark.delete_instance(recursive=True)
             flash(u'你刚刚删除了一个书签', 'success')
             return redirect(url_for('bookmark'))
