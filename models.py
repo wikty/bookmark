@@ -1,14 +1,14 @@
 import os
 import re
+import hashlib
 import datetime
 import subprocess
-
-from hashlib import md5
 
 from flask_peewee.auth import BaseUser
 from peewee import *
 
 from app import db
+from config import *
 from filedeliver import upload_file, remove_file
 
 class User(db.Model, BaseUser):
@@ -49,16 +49,22 @@ class Bookmark(db.Model):
         
         exitcode = subprocess.call(params)
         if exitcode == 0:
+            # May be should add try again
             remote_url = upload_file(outfile)
             if remote_url is not None:
                 self.image = remote_url
-                return
-            # remove generated local file
+        
+        # if fetch or upload failure, using a placeholder image
+        if not self.image:
+            self.image = os.path.join('/static/img', 'placeholder.png')
+        
+        # remove generated local file
+        if os.path.isfile(outfile):
             os.unlink(outfile)
 
-        # if fetch or upload failure, using a placeholder image
-        self.image = os.path.join('/static/img', 'placeholder.png')
-
+    def destory_image(self):
+        remove_file(self.image)
+    
     def fetch_tags(self):
         return Tag.select().join(Relationship).join(Bookmark).where(Bookmark.url == self.url)
     
