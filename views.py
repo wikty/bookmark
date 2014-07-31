@@ -177,9 +177,13 @@ def bookmark_edit(id):
             try:
                 db.database.set_autocommit(False)
                 
-                bookmark.url = request.form['url']
+                # before update image, should remove old version
+                if bookmark.url != request.form['url']:
+                    bookmark.destory_image()
+                    bookmark.url = request.form['url']
+                    bookmark.fetch_image()
+                
                 bookmark.title = request.form['title']
-                bookmark.fetch_image()
                 bookmark.save()
                 
                 tagnames = re.split('\s+', request.form['tags'].strip())
