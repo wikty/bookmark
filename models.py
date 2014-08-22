@@ -15,6 +15,7 @@ class User(db.Model, BaseUser):
     username = CharField()
     password = CharField()
     email = CharField()
+    introduction = CharField(default='')
     join_date = DateTimeField(default=datetime.datetime.now)
     active = BooleanField(default=True)
     admin = BooleanField(default=False)
@@ -24,7 +25,7 @@ class User(db.Model, BaseUser):
 
     def gravatar_url(self, size=80):
         return 'http://www.gravatar.com/avatar/%s?d=identicon&s=%d' % \
-            (md5(self.email.strip().lower().encode('utf-8')).hexdigest(), size)
+            (hashlib.md5(self.email.strip().lower().encode('utf-8')).hexdigest(), size)
 
 class Bookmark(db.Model):
     url = CharField()
