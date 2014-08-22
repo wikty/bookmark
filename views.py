@@ -28,7 +28,7 @@ def index():
     else:
         # random pick 30 bookmarks, If Database is MySQL, please use fn.Rand()
         # fn come from, from peewee import *
-        bookmarks = Bookmark.select(Bookmark, User.username).join(User).order_by(fn.Random()).limit(PERPAGE)
+        bookmarks = Bookmark.select().order_by(fn.Random()).limit(PERPAGE)
         return object_list('bookmark_list.html',
                             bookmarks,
                             'bookmarks',
@@ -62,6 +62,7 @@ def signup():
                 user = User(
                     username=request.form['username'],
                     email=request.form['email'],
+                    introduction=request.form['introduction'][:140],
                     join_date=datetime.datetime.now()
                 )
                 
@@ -242,3 +243,14 @@ def bookmark_remove(id):
 @app.route('/404/')
 def page_404():
     return render_template('404.html')
+
+
+@app.route('/users/<username>/profile/')
+def user_profile(username):
+    try:
+        user = User.get(User.username == username)
+    except User.DoesNotExist:
+        flash(u'你要查看的用户不存在', 'error')
+        return redirect(url_for('page_404'))
+
+    return render_template('user_profile.html', user=user)
