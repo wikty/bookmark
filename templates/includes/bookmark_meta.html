@@ -11,15 +11,19 @@
             <a href="{{ bookmark.url }}">{{ bookmark.url }}</a>
             {% endif %}
             </p>
-            <p class="muted">{{ bookmark.created_date.strftime("%Y-%m-%d %H:%M") }}</p>
+            <p class="muted">{{ bookmark.created_date.strftime("%Y-%m-%d %H:%M") }}
+            {% if not user %}
+            By <a href="{{ url_for('user_profile', username=bookmark.user.username) }}"><img class="avatar" src="{{ bookmark.user.gravatar_url() }}" title="{{ bookmark.user.username }}" /></a>
+            {% endif %}
+            </p>
             <p><a href="{{ bookmark.url }}" class="btn btn-primary">Go</a>
             {% if user and bookmark.user == user %}
-            <a id="editBookmarkBtn" class="btn btn-inverse" href="{{ url_for('bookmark_edit', id=bookmark.id) }}"><icon class="icon-edit icon-white double-bigger-icon"></icon></a>
+            <a id="editBookmarkBtn" class="btn btn-inverse" href="{{ url_for('bookmark_edit', id=bookmark.id) }}"><icon class="icon-edit icon-white"></icon></a>
             {% endif %}
             </p>
         </div>
         {% if user and bookmark.user == user %}
-        	<a id="removeBookmarkBtn" class="btn btn-inverse hide" href="{{ url_for('bookmark_remove', id=bookmark.id) }}"><icon class="icon-remove-sign icon-white double-bigger-icon"></icon></a>
+        	<a id="removeBookmarkBtn" class="btn btn-inverse btn-mini hide" href="{{ url_for('bookmark_remove', id=bookmark.id) }}"><icon class="icon-remove-sign icon-white"></icon></a>
         {% endif %}
     </div>
 </li>
