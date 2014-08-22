@@ -42,19 +42,19 @@ $(document).ready(function(){
     };
     
     
-    function wrapOnGroup($s, step, wrapper){
-        for(var i=0; i<$s.length; i+=step){ // must use $s.length, because length is changing
-            $s.slice(i, i+step).wrapAll(wrapper);
-            console.log($s.length);
-        }
-    }
+    // function wrapOnGroup($s, step, wrapper){
+    //     for(var i=0; i<$s.length; i+=step){ // must use $s.length, because length is changing
+    //         $s.slice(i, i+step).wrapAll(wrapper);
+    //         console.log($s.length);
+    //     }
+    // }
     ///////////////////////////////////////////////////////////////////////////
-    if($.contains("body", "ul.thumbnails")){
+    // if($.contains("body", "ul.thumbnails")){
     
-        alert('has ul.thumbnails');
+    //     alert('has ul.thumbnails');
         
         $("ul.thumbnails>li").css({"margin-left": "2.127659574468085%", "clear": "none"}).filter(":nth-child("+(maxZoom/$("ul.thumbnails>li").attr("class").match(/\d+$/)[0])+"n+1)").css({"margin-left": "0%", "clear": "both"});
         $("#zoomin").on("click", onZoomIn);
         $("#zoomout").on("click", onZoomOut);
-    }
+    //}
 });
