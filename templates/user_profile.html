@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="media">
+		<a class="pull-left" href="#">
+			<img class="media-object" src="{{ user.gravatar_url() }}" title="{{ user.username }}" />
+		</a>
+		
+		<div class="media-body">
+			<div class="media">
+				<h4 class="media-heading">{{ user.username }}<h4>
+				<table class="table">
+					<tr>
+						<th>个人简介</th>
+						<td>
+						{% if user.introduction %}
+						{{ user.introduction }}
+						{% else %}
+						暂无
+						{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<th>共创建书签</th>
+						<td>{{ user.Bookmarks.count() }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<h3>最近创建的10个书签</h3>
+		<hr/>
+		{% with bookmarks=user.Bookmarks.paginate(1, 10) %}
+		<ul class="thumbnails">
+			{% for bookmark in bookmarks %}
+    	    	{# should pass bookmark and user objects into bookmark_meta.html #}
+	        	{% include "includes/bookmark_meta.html" ignore missing with context %}
+	    	{% endfor %}
+		</ul>
+		{% endwith %}
+	</div>
+{% endblock %}
