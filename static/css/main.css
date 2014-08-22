@@ -60,13 +60,19 @@ body {
 
 #removeBookmarkBtn {
   position: absolute;
-  right: -12px;
-  bottom: -12px; 
+  right: -14px;
+  bottom: -14px; 
+  padding:0;
+  margin:0;
   width: 28px; 
   height: 28px; 
   -webkit-border-radius: 14px 14px 14px 14px; 
   -moz-border-radius: 14px 14px 14px 14px; 
   border-radius: 14px 14px 14px 14px;
+}
+
+#removeBookmarkBtn icon {
+  margin: 7px auto;
 }
 
 .double-bigger-icon {
@@ -118,4 +124,9 @@ div.thumbnail p {
   height: auto;
   margin-bottom: 15px;
   padding: 7px 9px;
+}
+
+
+.avatar {
+  height: 20px;
 }
