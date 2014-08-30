@@ -254,3 +254,38 @@ def user_profile(username):
         return redirect(url_for('page_404'))
 
     return render_template('user_profile.html', user=user)
+
+@app.route('/users/settings/', methods=['GET', 'POST'])
+@auth.login_required
+def user_settings():
+    user = auth.get_logged_in_user()
+    error = {}
+
+    if request.method == 'POST':
+        if not request.form['email']:
+            error['email'] = u'请填写邮箱'
+        elif not validate_email(request.form['email']):
+            # if you want to validate is avaiable
+            # validate_email(request.form['email'], verify=True)
+            error['email'] = u'请填写有效的邮箱'
+        if not request.form['opassword']:
+            error['password'] = u'请输入原密码'
+        elif not user.check_password(request.form['opassword']):
+            error['password'] = u'原密码不正确'
+        elif not request.form['npassword']:
+            error['password'] = u'请输入新密码'
+        
+        if not error:
+            user.email = request.form['email']
+            user.introduction = request.form['introduction']
+            user.set_password(request.form['npassword'])
+            user.save()
+            
+            flash(Markup(u'个人信息刚刚修改完成'), 'success')
+                # or directly make user to login
+                # auth.login_user(user)
+                # return redirect(url_for('bookmark'))
+            return redirect(url_for('user_profile', username=user.username))
+
+
+    return render_template('user_settings.html', user=user, error=error)

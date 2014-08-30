@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <form class="form-sign" action="{{ url_for('user_settings') }}" method="post">
+    <h2 class="form-sign-heading">个人信息</h2>
+    {% with messages = get_flashed_messages(with_categories=true, category_filter=["success", ]) %}
+	    {% if messages %}
+	        {% for category, message in messages %}
+	    	<div class="alert alert-{{ category }}">
+	    		<button type="button" class="close" data-dismiss="alert">&times;</button>
+	    		<p>{{ message }}</p>
+	    	</div>
+	    	{% endfor %}
+	    {% endif %}
+    {% endwith %}
+    <span class="input-block-level uneditable-input">{{ user.username }}</span>
+    {% if error['email'] %}
+    <span class="help-block text-error">{{ error['email'] }}</span>
+    {% endif %}
+    <input type="text" class="input-block-level" placeholder="邮箱" name="email" {% if user.email %} value="{{ user.email }}" {% endif %}/>
+   {% if error['password'] %}
+    <span class="help-block text-error">{{ error['password'] }}</span>
+    {% endif %}
+    <input type="password" class="input-block-level" placeholder="原密码" name="opassword" /> 
+    <input type="password" class="input-block-level" placeholder="新密码" name="npassword" />
+    <input type="text" class="input-block-level" placeholder="个人简介(可选的)" name="introduction" {% if user.introduction %} value="{{ user.introduction }}"  {% endif %}/>
+    <button class="btn btn-large btn-primary" type="submit">提交修改</button>
+  </form>
+{% endblock %}
